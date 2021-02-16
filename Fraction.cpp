@@ -11,8 +11,16 @@ namespace fraction
 	bool Fraction::debug = true;
 
 	/* Конструктор */
-	Fraction::Fraction(int _x, int _y) : x(_x), y(_y), id(++_id)
+	Fraction::Fraction(int _x, int _y) : id(++_id)
 	{
+		if (_x == 0 || _y == 0)
+		{
+			throw "You cannot use zero as a numerator or denominator.";
+		}
+
+		this->x = _x;
+		this->y = _y;
+
 		if (debug)
 		{
 			cout << "Constructor 'Fraction' with ID: " << this->id << endl;
@@ -64,6 +72,19 @@ namespace fraction
 	Fraction Fraction::operator*(int multiplier)
 	{
 		return *this *= multiplier;
+	}
+
+	/* Перезрузка операции деления дроби на целое число */
+	Fraction& Fraction::operator/=(int divider)
+	{
+		this->x /= divider;
+		this->y /= divider;
+
+		return *this;
+	}
+	Fraction Fraction::operator/(int divider)
+	{
+		return *this /= multiplier;
 	}
 
 	/* Перегрузка операции умножения */
@@ -204,5 +225,9 @@ namespace fraction
 	int Fraction::GetDenominator() const
 	{
 		return this->y;
+	}
+	int Fraction::GetId() const
+	{
+		return this->id;
 	}
 }

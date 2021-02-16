@@ -13,13 +13,17 @@ namespace fraction
 		size_t id;
 	public:
 		/* Конструкторы и деструктор */
-		Fraction(int x = 0, int y = 0);
+		Fraction(int _x = 1, int _y = 1);
 		Fraction(const Fraction& other);
 		~Fraction();
 
 		/* Перезрузка операции умножения дроби на целое число */
 		Fraction& operator*=(int multiplier);
 		Fraction operator*(int multiplier);
+
+		/* Перезрузка операции деления дроби на целое число */
+		Fraction& operator/=(int divider);
+		Fraction operator/(int divider);
 
 		/* Перегрузка операции умножения */
 		Fraction& operator*=(const Fraction& other);
@@ -55,6 +59,7 @@ namespace fraction
 		/* Геттеры */
 		int GetNumerator() const;
 		int GetDenominator() const;
+		int GetId() const;
 	};
 }
 
