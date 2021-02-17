@@ -17,6 +17,9 @@ namespace fraction
 		Fraction(const Fraction& other);
 		~Fraction();
 
+		/* Перегрузка оператора копирования */
+		const Fraction& operator=(const Fraction& other);
+
 		/* Перезрузка операции умножения дроби на целое число */
 		Fraction& operator*=(int multiplier);
 		Fraction operator*(int multiplier);
@@ -41,11 +44,11 @@ namespace fraction
 		Fraction& operator-=(const Fraction& other);
 		Fraction operator-(const Fraction& other);
 
-		/* Перегрузка операторов копирования и перемещения */
-		const Fraction& operator=(const Fraction& other);
-
 		/* Перегрузка оператора вывода в поток */
 		friend std::ostream& operator<< (std::ostream& out, const Fraction& fraction);
+
+		/* Функция преобразования неправильной дроби */
+		void ShowCorrectFraction() const;
 
 		/* Функции поиска общих делителей */
 		int FindMaxDivider(int n, int m) const;

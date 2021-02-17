@@ -13,9 +13,9 @@ namespace fraction
 	/* Конструктор */
 	Fraction::Fraction(int _x, int _y) : id(++_id)
 	{
-		if (_x == 0 || _y == 0)
+		if (_y == 0)
 		{
-			throw "You cannot use zero as a numerator or denominator.";
+			throw "You cannot use zero as a denominator.";
 		}
 
 		this->x = _x;
@@ -84,7 +84,7 @@ namespace fraction
 	}
 	Fraction Fraction::operator/(int divider)
 	{
-		return *this /= multiplier;
+		return *this /= divider;
 	}
 
 	/* Перегрузка операции умножения */
@@ -171,8 +171,35 @@ namespace fraction
 			out << fraction.x;
 			return out;
 		}
+		if (fraction.x == 0)
+		{
+			out << "0";
+			return out;
+		}
+
 		out << fraction.x << "/" << fraction.y;
 		return out;
+	}
+
+	/* Функция преобразования неправильной дроби */
+	void Fraction::ShowCorrectFraction() const
+	{
+		if (abs(this->x) < abs(this->y))
+		{
+			cout << "Дробь правильная." << endl;
+			return;
+		}
+
+		int integer = this->x / this->y;
+		int numinator = this->x % this->y;
+
+		cout << "Целая часть: " << integer << endl;
+		if (numinator != 0)
+		{
+			cout << "Дробная часть: " << numinator << "/" << this->y << endl;
+		}
+
+		return;
 	}
 
 	/* Функция поиска общего делителя */

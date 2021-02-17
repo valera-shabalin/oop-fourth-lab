@@ -9,11 +9,9 @@ int main()
 {
     setlocale(LC_CTYPE, "Rus");
 
-    Fraction f1;
-    Fraction f2;
-    Fraction summ = f1 + f2;
+    Fraction f1(1, 1);
 
-    cout << summ << endl;
+    cout << f1 << endl;
 
     return 0;
 }
