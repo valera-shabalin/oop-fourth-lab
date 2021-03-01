@@ -8,7 +8,7 @@ using namespace std;
 namespace fraction
 {
 	size_t Fraction::_id = 0;
-	bool Fraction::debug = true;
+	bool Fraction::debug = false;
 
 	/* Конструктор */
 	Fraction::Fraction(int _x, int _y) : id(++_id)
@@ -116,18 +116,14 @@ namespace fraction
 	/* Перегрузка операции сложения */
 	Fraction& Fraction::operator+=(const Fraction& other)
 	{
-		int multiple = this->FindMinMultiple(this->y, other.y);
+		int multiple = this->FindMinMultiple(this->y, other.y); //60
 		int x = other.x;
+		int y = other.y;
 
-		if (this->y > other.y)
-		{
-			x *= multiple / other.y;
-		}
-		else
-		{
-			*this *= multiple / this->y;
-		}
-		this->x += x;
+		this->x *= multiple / this->y;
+		this->x += x * multiple / y;
+
+		this->y = multiple;
 
 		this->Reduction();
 
@@ -141,18 +137,14 @@ namespace fraction
 	/* Перегрузка операции вычитания */
 	Fraction& Fraction::operator-=(const Fraction& other)
 	{
-		int multiple = this->FindMinMultiple(this->y, other.y);
+		int multiple = this->FindMinMultiple(this->y, other.y); //60
 		int x = other.x;
+		int y = other.y;
 
-		if (this->y > other.y)
-		{
-			x *= multiple / other.y;
-		}
-		else
-		{
-			*this *= multiple / this->y;
-		}
-		this->x -= x;
+		this->x *= multiple / this->y;
+		this->x += x * multiple / y;
+
+		this->y = multiple;
 
 		this->Reduction();
 
