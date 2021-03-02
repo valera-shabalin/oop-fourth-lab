@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 #include "Polynomial.h"
 
@@ -169,13 +170,13 @@ namespace polynomial
 	/* Перегрузка операции умножения */
 	Polynomial& Polynomial::operator*=(const Polynomial& other)
 	{
-		Polynomial result(this->deg * other.deg);
+		Polynomial result(this->deg + other.deg);
 
 		for (size_t i = 0; i < this->length; i++)
 		{
 			for (size_t j = 0; j < other.length; j++)
 			{
-				result.mass[i + j] = this->mass[i] * other.mass[j];
+				result.mass[i + j] += this->mass[i] * other.mass[j];
 			}
 		}
 
@@ -203,6 +204,19 @@ namespace polynomial
 		return Polynomial(*this) *= k;
 	}
 
+	/* Перегрузка оператора () */
+	double Polynomial::operator()(int x) const
+	{
+		int result = this->mass[0];
+
+		for (size_t i = 1; i < this->length; i++)
+		{
+			result += this->mass[i] * pow(x, i);
+		}
+
+		return result;
+	}
+
 	/* Очистить полином */
 	void Polynomial::MakeNull()
 	{
@@ -224,7 +238,14 @@ namespace polynomial
 
 		for (size_t i = 1; i < polynomial.length; i++)
 		{
-			out << " + " << polynomial.mass[i] << "x^" << i;
+			if (polynomial.mass[i] < 0)
+			{
+				out << " + (" << polynomial.mass[i] << "x^" << i << ")";
+			}
+			else
+			{
+				out << " + " << polynomial.mass[i] << "x^" << i;
+			}
 		}
 		out << endl;
 

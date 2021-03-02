@@ -40,6 +40,9 @@ namespace polynomial
 		Polynomial& operator*=(double k);
 		Polynomial operator*(double k);
 
+		/* Перегрузка оператора () */
+		double operator()(int x) const;
+
 		/* Очистить полином */
 		void MakeNull();
 
