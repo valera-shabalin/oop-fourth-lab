@@ -261,6 +261,12 @@ namespace fraction
 			throw "You cannot use a zero as deminator";
 		}
 
+		if (_deminator < 0)
+		{
+			_deminator = abs(_deminator);
+			this->numenator *= -1;
+		}
+
 		this->deminator = _deminator;
 		this->Reduction();
 
@@ -271,6 +277,12 @@ namespace fraction
 		if (_deminator == 0)
 		{
 			throw "You cannot use a zero as deminator";
+		}
+
+		if (_deminator < 0)
+		{
+			_deminator = abs(_deminator);
+			_numenator *= -1;
 		}
 
 		this->numenator = _numenator;

@@ -19,7 +19,9 @@ int main()
 {
     setlocale(LC_CTYPE, "Rus");
 
+    Polynomial x(3);
 
+    cout << x;
 
     return 0;
 }

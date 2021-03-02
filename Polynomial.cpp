@@ -30,18 +30,18 @@ namespace polynomial
 		}
 	}
 
-	/* Конструктор копирования */
-	Polynomial::Polynomial(const Polynomial& other)
-	{
-		*this = other;
-	}
-
 	/* Конструктор, принимающий пользовательскую функцию */
 	Polynomial::Polynomial(size_t _deg, double(*func)(size_t)) : Polynomial(_deg) {
 		for (size_t i = 0; i < _deg; i++)
 		{
 			this->mass[i] = func(i);
 		}		
+	}
+
+	/* Конструктор копирования */
+	Polynomial::Polynomial(const Polynomial& other)
+	{
+		*this = other;
 	}
 
 	/* Оператор копирования = */
@@ -57,15 +57,40 @@ namespace polynomial
 			return *this;
 		}
 
+		if (this->deg != other.deg)
+		{
+			this->MakeNull();
+			this->deg = other.deg;
+			this->mass = new double[this->deg];
+		}
+
+		copy(other.mass, other.mass + other.deg, this->mass);
+
+		return *this;
+	}
+
+	/* Конструктор перемещения */
+	Polynomial::Polynomial(Polynomial&& other) : Polynomial() {
+		*this = move(other);
+	}
+
+	/* Оператор перемещения */
+	Polynomial& Polynomial::operator=(Polynomial&& other)
+	{
+		if (debug)
+		{
+			cout << "Copy constructor 'Polynomial': " << this->id << " <= " << other.id << endl;
+		}
+
+		if (this == &other)
+		{
+			return *this;
+		}
+
 		this->MakeNull();
 
-		this->deg = other.deg;
-		this->mass = new double[this->deg];
-
-		for (size_t i = 0; i < this->deg; i++)
-		{
-			this->mass[i] = other.mass[i];
-		}
+		swap(this->mass, other.mass);
+		swap(this->deg, other.deg);
 
 		return *this;
 	}
@@ -81,6 +106,101 @@ namespace polynomial
 		}
 	}
 
+	/* Перегрузка операции сложения */
+	Polynomial& Polynomial::operator+=(const Polynomial& other)
+	{
+		if (this->deg > other.deg)
+		{
+			for (size_t i = 0; i < this->deg; i++)
+			{
+				this->mass[i] += other.mass[i];
+			}
+		}
+		else 
+		{
+			Polynomial result(other.deg);
+
+			for (size_t i = 0; i < other.deg; i++)
+			{
+				result.mass[i] = this->mass[i] + other.mass[i];
+			}
+
+			*this = move(result);
+		}
+
+		return *this;
+	}
+	Polynomial Polynomial::operator+(const Polynomial& other)
+	{
+		return Polynomial(*this += other);
+	}
+
+	/* Перегрузка операции вычитания */
+	Polynomial& Polynomial::operator-=(const Polynomial& other)
+	{
+		if (this->deg > other.deg)
+		{
+			for (size_t i = 0; i < this->deg; i++)
+			{
+				this->mass[i] -= other.mass[i];
+			}
+		}
+		else
+		{
+			Polynomial result(other.deg);
+
+			for (size_t i = 0; i < other.deg; i++)
+			{
+				result.mass[i] = this->mass[i] - other.mass[i];
+			}
+
+			*this = move(result);
+		}
+
+		return *this;
+	}
+	Polynomial Polynomial::operator-(const Polynomial& other)
+	{
+		return Polynomial(*this -= other);
+	}
+
+	/* Перегрузка операции умножения */
+	Polynomial& Polynomial::operator*=(const Polynomial& other)
+	{
+		Polynomial result(this->deg * other.deg);
+
+		for (size_t i = 0; i < this->deg; i++)
+		{
+			for (size_t j = 0; j < other.deg; j++)
+			{
+				result.mass[i + j] = this->mass[i] * other.mass[j];
+			}
+		}
+
+		*this = move(result);
+
+		return *this;
+	}
+	Polynomial Polynomial::operator*(const Polynomial& other)
+	{
+		return Polynomial(*this) *= other;
+	}
+
+	/* Перегрузка операции умножения на число */
+	Polynomial& Polynomial::operator*=(double k)
+	{
+		for (size_t i = 0; i < this->deg; i++)
+		{
+			this->mass[i] *= k;
+		}
+
+		return *this;
+	}
+	Polynomial Polynomial::operator*(double k)
+	{
+		return Polynomial(*this *= k);
+	}
+
 	/* Очистить полином */
 	void Polynomial::MakeNull()
 	{
@@ -93,6 +213,18 @@ namespace polynomial
 		this->deg = 0;
 
 		return;
+	}
+
+	/* Перегрузка оператора вывода */
+	ostream& operator<< (ostream& out, const Polynomial& polynomial)
+	{
+		for (size_t i = 0; i < polynomial.deg - 1; i++)
+		{
+			cout << polynomial.mass[i] << " + ";
+		}
+		cout << polynomial.mass[polynomial.deg - 1] << endl;
+
+		return out;
 	}
 
 	/* Геттеры */
