@@ -11,15 +11,9 @@ namespace fraction
 	bool Fraction::debug = false;
 
 	/* Конструктор */
-	Fraction::Fraction(int _x, int _y) : id(++_id)
+	Fraction::Fraction(int _numenator, int _deminator) : id(++_id)
 	{
-		if (_y == 0)
-		{
-			throw "You cannot use zero as a denominator.";
-		}
-
-		this->x = _x;
-		this->y = _y;
+		this->Set(_numenator, _deminator);
 
 		if (debug)
 		{
@@ -46,8 +40,7 @@ namespace fraction
 			return *this;
 		}
 
-		this->x = other.x;
-		this->y = other.y;
+		this->Set(other.numenator, other.deminator);
 
 		return *this;
 	}
@@ -64,8 +57,7 @@ namespace fraction
 	/* Перезрузка операции умножения дроби на целое число */
 	Fraction& Fraction::operator*=(int multiplier)
 	{
-		this->x *= multiplier;
-		this->y *= multiplier;
+		this->Set(this->numenator * multiplier, this->deminator * multiplier);
 
 		return *this;
 	}
@@ -77,8 +69,7 @@ namespace fraction
 	/* Перезрузка операции деления дроби на целое число */
 	Fraction& Fraction::operator/=(int divider)
 	{
-		this->x /= divider;
-		this->y /= divider;
+		this->Set(this->numenator / divider, this->deminator / divider);
 
 		return *this;
 	}
@@ -90,8 +81,7 @@ namespace fraction
 	/* Перегрузка операции умножения */
 	Fraction& Fraction::operator*=(const Fraction& other)
 	{
-		this->x *= other.x;
-		this->y *= other.y;
+		this->Set(this->numenator * other.numenator, this->deminator * other.deminator);
 
 		return *this;
 	}
@@ -103,8 +93,7 @@ namespace fraction
 	/* Перегрузка операции деления */
 	Fraction& Fraction::operator/=(const Fraction& other)
 	{
-		this->x /= other.x;
-		this->y /= other.y;
+		this->Set(this->numenator / other.numenator, this->deminator / other.deminator);
 
 		return *this;
 	}
@@ -116,16 +105,15 @@ namespace fraction
 	/* Перегрузка операции сложения */
 	Fraction& Fraction::operator+=(const Fraction& other)
 	{
-		int multiple = this->FindMinMultiple(this->y, other.y); //60
-		int x = other.x;
-		int y = other.y;
+		int multiple = this->FindMinMultiple(this->deminator, other.deminator);
 
-		this->x *= multiple / this->y;
-		this->x += x * multiple / y;
+		int other_numenator = other.numenator;
+		int tmp = this->numenator;
 
-		this->y = multiple;
+		tmp *= multiple / this->deminator;
+		tmp += other_numenator * multiple / other.deminator;
 
-		this->Reduction();
+		this->Set(tmp, multiple);
 
 		return *this;
 	}
@@ -137,16 +125,15 @@ namespace fraction
 	/* Перегрузка операции вычитания */
 	Fraction& Fraction::operator-=(const Fraction& other)
 	{
-		int multiple = this->FindMinMultiple(this->y, other.y); //60
-		int x = other.x;
-		int y = other.y;
+		int multiple = this->FindMinMultiple(this->deminator, other.deminator);
 
-		this->x *= multiple / this->y;
-		this->x += x * multiple / y;
+		int other_numenator = other.numenator;
+		int tmp = this->numenator;
 
-		this->y = multiple;
+		tmp *= multiple / this->deminator;
+		tmp -= other_numenator * multiple / other.deminator;
 
-		this->Reduction();
+		this->Set(tmp, multiple);
 
 		return *this;
 	}
@@ -158,37 +145,37 @@ namespace fraction
 	/* Перегрузка оператора вывода в поток */
 	ostream& operator<< (std::ostream& out, const Fraction& fraction)
 	{
-		if (fraction.y == 1)
+		if (fraction.deminator == 1)
 		{
-			out << fraction.x;
+			out << fraction.numenator;
 			return out;
 		}
-		if (fraction.x == 0)
+		if (fraction.numenator == 0)
 		{
 			out << "0";
 			return out;
 		}
 
-		out << fraction.x << "/" << fraction.y;
+		out << fraction.numenator << "/" << fraction.deminator;
 		return out;
 	}
 
 	/* Функция преобразования неправильной дроби */
 	void Fraction::ShowCorrectFraction() const
 	{
-		if (abs(this->x) < abs(this->y))
+		if (abs(this->numenator) < abs(this->deminator))
 		{
 			cout << "Дробь правильная." << endl;
 			return;
 		}
 
-		int integer = this->x / this->y;
-		int numinator = this->x % this->y;
+		int integer = this->numenator / this->deminator;
+		int numinator = this->numenator % this->deminator;
 
 		cout << "Целая часть: " << integer << endl;
 		if (numinator != 0)
 		{
-			cout << "Дробная часть: " << numinator << "/" << this->y << endl;
+			cout << "Дробная часть: " << numinator << "/" << this->deminator << endl;
 		}
 
 		return;
@@ -228,10 +215,9 @@ namespace fraction
 	/* Сокращение дроби */
 	Fraction& Fraction::Reduction()
 	{
-		int divider = this->FindMaxDivider(this->x, this->y);
+		int divider = this->FindMaxDivider(this->numenator, this->deminator);
 		
-		this->x /= divider;
-		this->y /= divider;
+		this->Set(this->numenator / divider, this->deminator / divider);
 
 		return *this;
 	}
@@ -239,14 +225,59 @@ namespace fraction
 	/* Геттеры */
 	int Fraction::GetNumerator() const
 	{
-		return this->x;
+		return this->numenator;
 	}
 	int Fraction::GetDenominator() const
 	{
-		return this->y;
+		return this->deminator;
 	}
 	int Fraction::GetId() const
 	{
 		return this->id;
+	}
+	
+	/* Сеттеры */
+	Fraction& Fraction::SetNumerator(int _numenator)
+	{
+		if (this->numenator == _numenator)
+		{
+			return *this;
+		}
+
+		this->numenator = _numenator;
+		this->Reduction();
+
+		return *this;
+	}
+	Fraction& Fraction::SetDenominator(int _deminator)
+	{
+		if (this->deminator == _deminator)
+		{
+			return *this;
+		}
+
+		if (_deminator == 0)
+		{
+			throw "You cannot use a zero as deminator";
+		}
+
+		this->deminator = _deminator;
+		this->Reduction();
+
+		return *this;
+	}
+	Fraction& Fraction::Set(int _numenator, int _deminator)
+	{
+		if (_deminator == 0)
+		{
+			throw "You cannot use a zero as deminator";
+		}
+
+		this->numenator = _numenator;
+		this->deminator = _deminator;
+
+		this->Reduction();
+
+		return *this;
 	}
 }

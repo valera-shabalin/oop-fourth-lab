@@ -16,6 +16,7 @@ namespace polynomial
 		/* Конструкторы и деструктор */
 		Polynomial(size_t _deg = 0, double* _mass = nullptr);
 		Polynomial(const Polynomial& other);
+		Polynomial(size_t _deg, double(*func)(size_t));
 		~Polynomial();
 
 		/* Перегрузка оператора копирования */
@@ -23,6 +24,10 @@ namespace polynomial
 
 		/* Очистить полином */
 		void MakeNull();
+
+		/* Геттеры */
+		size_t GetId() const;
+		size_t GetDeg() const;
 	};
 }
 

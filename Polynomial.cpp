@@ -16,11 +16,12 @@ namespace polynomial
 
 		if (this->deg != 0)
 		{
-			this->mass = new double[this->deg];
-			for (size_t i = 0; i < this->deg; i++)
-			{
-				this->mass[i] = _mass[i];
-			}
+			this->mass = new double[this->deg]();
+		}
+
+		if (_mass != nullptr)
+		{
+			copy(_mass, _mass + _deg, this->mass);
 		}
 
 		if (debug)
@@ -33,6 +34,14 @@ namespace polynomial
 	Polynomial::Polynomial(const Polynomial& other)
 	{
 		*this = other;
+	}
+
+	/* Конструктор, принимающий пользовательскую функцию */
+	Polynomial::Polynomial(size_t _deg, double(*func)(size_t)) : Polynomial(_deg) {
+		for (size_t i = 0; i < _deg; i++)
+		{
+			this->mass[i] = func(i);
+		}		
 	}
 
 	/* Оператор копирования = */
@@ -48,7 +57,7 @@ namespace polynomial
 			return *this;
 		}
 
-		this->ClearData();
+		this->MakeNull();
 
 		this->deg = other.deg;
 		this->mass = new double[this->deg];
@@ -61,10 +70,21 @@ namespace polynomial
 		return *this;
 	}
 
+	/* Деструктор */
+	Polynomial::~Polynomial()
+	{
+		this->MakeNull();
+
+		if (debug)
+		{
+			cout << "Destructor 'Polynomial' with ID: " << this->id << endl;
+		}
+	}
+
 	/* Очистить полином */
 	void Polynomial::MakeNull()
 	{
-		if (this->mass == nullptr) 
+		if (this->mass == nullptr)
 		{
 			delete[] this->mass;
 			this->mass = nullptr;
@@ -75,14 +95,13 @@ namespace polynomial
 		return;
 	}
 
-	/* Деструктор */
-	Polynomial::~Polynomial()
+	/* Геттеры */
+	size_t Polynomial::GetId() const
 	{
-		this->ClearData();
-
-		if (debug)
-		{
-			cout << "Destructor 'Polynomial' with ID: " << this->id << endl;
-		}
+		return this->id;
+	}
+	size_t Polynomial::GetDeg() const
+	{
+		return this->deg;
 	}
 }

@@ -9,11 +9,11 @@ namespace fraction
 		size_t static _id;
 		bool static debug;
 
-		int x, y;
+		int numenator, deminator;
 		size_t id;
 	public:
 		/* Конструкторы и деструктор */
-		Fraction(int _x = 1, int _y = 1);
+		Fraction(int _numenator = 0, int _deminator = 1);
 		Fraction(const Fraction& other);
 		~Fraction();
 
@@ -63,6 +63,11 @@ namespace fraction
 		int GetNumerator() const;
 		int GetDenominator() const;
 		int GetId() const;
+
+		/* Сеттеры */
+		Fraction& SetNumerator(int _numenator);
+		Fraction& SetDenominator(int _deminator);
+		Fraction& Set(int _numenator, int _deminator);
 	};
 }
 
