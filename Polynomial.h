@@ -9,7 +9,7 @@ namespace polynomial
 		size_t static _id;
 		bool static debug;
 
-		size_t id, deg;
+		size_t id, deg, length;
 		double* mass;
 
 	public:
@@ -17,12 +17,12 @@ namespace polynomial
 		Polynomial(size_t _deg = 0, double* _mass = nullptr);
 		Polynomial(const Polynomial& other);
 		Polynomial(size_t _deg, double(*func)(size_t));
-		Polynomial(Polynomial&& other);
+		Polynomial(Polynomial&& other) noexcept;
 		~Polynomial();
 
 		/* Перегрузка оператора копирования */
 		const Polynomial& operator=(const Polynomial& other);
-		Polynomial& operator=(Polynomial&& other);
+		Polynomial& operator=(Polynomial&& other) noexcept;
 
 		/* Перегрузка операции сложения */
 		Polynomial& operator+=(const Polynomial& other);

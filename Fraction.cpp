@@ -63,7 +63,7 @@ namespace fraction
 	}
 	Fraction Fraction::operator*(int multiplier)
 	{
-		return *this *= multiplier;
+		return Fraction(*this) *= multiplier;
 	}
 
 	/* Перезрузка операции деления дроби на целое число */
@@ -75,7 +75,7 @@ namespace fraction
 	}
 	Fraction Fraction::operator/(int divider)
 	{
-		return *this /= divider;
+		return Fraction(*this) /= divider;
 	}
 
 	/* Перегрузка операции умножения */
@@ -87,7 +87,7 @@ namespace fraction
 	}
 	Fraction Fraction::operator*(const Fraction& other)
 	{
-		return Fraction(*this *= other);
+		return Fraction(*this) *= other;
 	}
 
 	/* Перегрузка операции деления */
@@ -99,7 +99,7 @@ namespace fraction
 	}
 	Fraction Fraction::operator/(const Fraction& other)
 	{
-		return Fraction(*this /= other);
+		return Fraction(*this) /= other;
 	}
 
 	/* Перегрузка операции сложения */
@@ -119,7 +119,7 @@ namespace fraction
 	}
 	Fraction Fraction::operator+(const Fraction& other)
 	{
-		return Fraction(*this += other);
+		return Fraction(*this) += other;
 	}
 
 	/* Перегрузка операции вычитания */
@@ -139,7 +139,7 @@ namespace fraction
 	}
 	Fraction Fraction::operator-(const Fraction& other)
 	{
-		return Fraction(*this -= other);
+		return Fraction(*this) -= other;
 	}
 
 	/* Перегрузка оператора вывода в поток */

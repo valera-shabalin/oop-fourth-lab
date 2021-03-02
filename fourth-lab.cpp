@@ -19,9 +19,13 @@ int main()
 {
     setlocale(LC_CTYPE, "Rus");
 
-    Polynomial x(3);
+    auto func1 = [](size_t deg)->double { return rand_int(0, 10); };
+    auto func2 = [](size_t deg)->double { return rand_int(10, 20); };
 
-    cout << x;
+    Polynomial x(2, func1), y(3, func2);
+    Polynomial z = x - y;
+
+    cout << x << y << "diff = " << z;
 
     return 0;
 }
