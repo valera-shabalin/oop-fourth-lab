@@ -9,9 +9,11 @@ namespace polynomial
 		size_t static _id;
 		bool static debug;
 
-		size_t id, deg, length;
+		size_t id, deg;
 		double* mass;
 
+		/* Отбросить лишние коэффициенты */
+		Polynomial& Correct();
 	public:
 		/* Конструкторы и деструктор */
 		Polynomial(size_t _deg = 0, double* _mass = nullptr);
@@ -40,6 +42,9 @@ namespace polynomial
 		Polynomial& operator*=(double k);
 		Polynomial operator*(double k);
 
+		/* Перегрузка операции деления */
+		Polynomial operator/(const Polynomial& other);
+
 		/* Перегрузка оператора () */
 		double operator()(int x) const;
 
@@ -52,6 +57,7 @@ namespace polynomial
 		/* Геттеры */
 		size_t GetId() const;
 		size_t GetDeg() const;
+		int GetValue(size_t deg) const;
 	};
 }
 

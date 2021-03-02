@@ -19,13 +19,13 @@ int main()
 {
     setlocale(LC_CTYPE, "Rus");
 
-    auto func1 = [](size_t deg)->double { return rand_int(-10, 10); };
-    auto func2 = [](size_t deg)->double { return rand_int(10, 20); };
+    auto func1 = [](size_t deg)->double { return rand_int(1, 5); };
+    auto func2 = [](size_t deg)->double { return rand_int(2, 6); };
 
-    Polynomial x(2, func1), y(3, func2);
-    Polynomial z = x * y;
+    Polynomial x(2, func1), y(2, func2);
+    Polynomial z = x - y;
 
-    cout << x << "result(5) = " << x(5);
+    cout << x << y << "summ = " << z;
 
     return 0;
 }

@@ -11,18 +11,18 @@ namespace polynomial
 	bool Polynomial::debug = false;
 
 	/* Конструктор */
-	Polynomial::Polynomial(size_t _deg, double* _mass) : id(++_id), deg(_deg), length(++_deg)
+	Polynomial::Polynomial(size_t _deg, double* _mass) : id(++_id), deg(_deg)
 	{
 		this->mass = nullptr;
 
 		if (this->deg != 0)
 		{
-			this->mass = new double[this->length]();
+			this->mass = new double[this->deg + 1]();
 		}
 
 		if (_mass != nullptr)
 		{
-			copy(_mass, _mass + this->length, this->mass);
+			copy(_mass, _mass + this->deg + 1, this->mass);
 		}
 
 		if (debug)
@@ -33,7 +33,7 @@ namespace polynomial
 
 	/* Конструктор, принимающий пользовательскую функцию */
 	Polynomial::Polynomial(size_t _deg, double(*func)(size_t)) : Polynomial(_deg) {
-		for (size_t i = 0; i < this->length; i++)
+		for (size_t i = 0; i < this->deg + 1; i++)
 		{
 			this->mass[i] = func(i);
 		}		
@@ -62,11 +62,10 @@ namespace polynomial
 		{
 			this->MakeNull();
 			this->deg = other.deg;
-			this->length = other.length;
-			this->mass = new double[this->length];
+			this->mass = new double[this->deg + 1];
 		}
 
-		copy(other.mass, other.mass + other.length, this->mass);
+		copy(other.mass, other.mass + other.deg + 1, this->mass);
 
 		return *this;
 	}
@@ -93,7 +92,6 @@ namespace polynomial
 
 		swap(this->mass, other.mass);
 		swap(this->deg, other.deg);
-		swap(this->length, other.length);
 
 		return *this;
 	}
@@ -114,7 +112,7 @@ namespace polynomial
 	{
 		if (this->deg > other.deg)
 		{
-			for (size_t i = 0; i < other.length; i++)
+			for (size_t i = 0; i < other.deg + 1; i++)
 			{
 				this->mass[i] += other.mass[i];
 			}
@@ -123,13 +121,15 @@ namespace polynomial
 		{
 			Polynomial result(other.deg);
 
-			for (size_t i = 0; i < other.length; i++)
+			for (size_t i = 0; i < other.deg + 1; i++)
 			{
 				result.mass[i] = this->mass[i] + other.mass[i];
 			}
 
 			*this = move(result);
 		}
+
+		this->Correct();
 
 		return *this;
 	}
@@ -143,7 +143,7 @@ namespace polynomial
 	{
 		if (this->deg > other.deg)
 		{
-			for (size_t i = 0; i < other.length; i++)
+			for (size_t i = 0; i < other.deg + 1; i++)
 			{
 				this->mass[i] -= other.mass[i];
 			}
@@ -152,13 +152,15 @@ namespace polynomial
 		{
 			Polynomial result(other.deg);
 
-			for (size_t i = 0; i < other.length; i++)
+			for (size_t i = 0; i < other.deg + 1; i++)
 			{
 				result.mass[i] = this->mass[i] - other.mass[i];
 			}
 
 			*this = move(result);
 		}
+
+		this->Correct();
 
 		return *this;
 	}
@@ -172,13 +174,15 @@ namespace polynomial
 	{
 		Polynomial result(this->deg + other.deg);
 
-		for (size_t i = 0; i < this->length; i++)
+		for (size_t i = 0; i < this->deg + 1; i++)
 		{
-			for (size_t j = 0; j < other.length; j++)
+			for (size_t j = 0; j < other.deg + 1; j++)
 			{
 				result.mass[i + j] += this->mass[i] * other.mass[j];
 			}
 		}
+
+		this->Correct();
 
 		*this = move(result);
 
@@ -192,10 +196,12 @@ namespace polynomial
 	/* Перегрузка операции умножения на число */
 	Polynomial& Polynomial::operator*=(double k)
 	{
-		for (size_t i = 0; i < this->length; i++)
+		for (size_t i = 0; i < this->deg + 1; i++)
 		{
 			this->mass[i] *= k;
 		}
+
+		this->Correct();
 
 		return *this;
 	}
@@ -204,12 +210,40 @@ namespace polynomial
 		return Polynomial(*this) *= k;
 	}
 
+	/* Перегрузка операции деления */
+	Polynomial Polynomial::operator/(const Polynomial& other)
+	{
+		Polynomial tmp = *this;
+
+		int rdeg = tmp.deg - other.deg + 1;
+
+		Polynomial res(rdeg);
+
+		for (size_t i = 0; i < rdeg; i++)
+		{
+			res.mass[rdeg - i - 1] = tmp.mass[tmp.deg - i - 1] / other.mass[other.deg - 1];
+
+			for (int j = 0; j < other.deg; j++)
+			{
+				tmp.mass[tmp.deg - j - i - 1] -= other.mass[other.deg - j - 1] * res.mass[rdeg - i - 1];
+			}
+		}
+
+		this->Correct();
+
+		if (tmp.deg != 0) {
+			cout << "!!! имеется остаток от деления " << tmp << endl;
+		}
+
+		return res;
+	}
+
 	/* Перегрузка оператора () */
 	double Polynomial::operator()(int x) const
 	{
 		int result = this->mass[0];
 
-		for (size_t i = 1; i < this->length; i++)
+		for (size_t i = 1; i < this->deg + 1; i++)
 		{
 			result += this->mass[i] * pow(x, i);
 		}
@@ -231,12 +265,23 @@ namespace polynomial
 		return;
 	}
 
+	/* Корректировка степени полинома */
+	Polynomial& Polynomial::Correct() {
+		if (this->mass[this->deg] == 0) {
+			do {
+				this->deg--;
+			} while (this->deg && this->mass[this->deg] == 0);
+		}
+
+		return *this;
+	}
+
 	/* Перегрузка оператора вывода */
 	ostream& operator<< (ostream& out, const Polynomial& polynomial)
 	{
 		out << polynomial.mass[0];
 
-		for (size_t i = 1; i < polynomial.length; i++)
+		for (size_t i = 1; i < polynomial.deg + 1; i++)
 		{
 			if (polynomial.mass[i] < 0)
 			{
@@ -260,5 +305,14 @@ namespace polynomial
 	size_t Polynomial::GetDeg() const
 	{
 		return this->deg;
+	}
+	int Polynomial::GetValue(size_t _deg) const
+	{
+		if (_deg > this->deg || _deg < 0)
+		{
+			return -1;
+		}
+
+		return this->mass[_deg];
 	}
 }
